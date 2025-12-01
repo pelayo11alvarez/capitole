@@ -35,7 +35,7 @@ public class ProductDetailApiClient implements ProductDetailRepository {
                     .uri("/product/{id}", id.value())
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-                        if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
+                        if (HttpStatus.NOT_FOUND == clientResponse.statusCode()) {
                             return Mono.error(new ProductNotFoundException());
                         }
                         return Mono.error(new /*ExternalServiceException*/Exception("4xx from product API"));
