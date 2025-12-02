@@ -8,6 +8,8 @@ import org.mapstruct.Mapping;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ProductClientMapper {
@@ -16,9 +18,9 @@ public interface ProductClientMapper {
     @Mapping(target = "availability", source = "availability")
     Product toDomain(ProductClientResponseDTO dto);
 
-    default List<ProductId> toProductIds(String[] ids) {
+    default Set<ProductId> toProductIds(String[] ids) {
         return Arrays.stream(ids)
                 .map(ProductId::new)
-                .toList();
+                .collect(Collectors.toSet());
     }
 }

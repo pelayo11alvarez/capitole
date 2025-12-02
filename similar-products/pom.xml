@@ -138,8 +138,8 @@
 
 							<generatorName>spring</generatorName>
 
-							<apiPackage>com.inditex.challenge.infrastructure.rest.mapper</apiPackage>
-							<modelPackage>com.inditex.challenge.infrastructure.rest.mapper.model</modelPackage>
+							<apiPackage>com.inditex.challenge.infrastructure.rest.api</apiPackage>
+							<modelPackage>com.inditex.challenge.infrastructure.rest.api.model</modelPackage>
 
 							<output>${project.build.directory}/generated-sources/openapi</output>
 

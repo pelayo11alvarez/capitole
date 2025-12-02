@@ -7,6 +7,8 @@ import com.inditex.challenge.domain.port.in.GetSimilarProductsUseCase;
 import com.inditex.challenge.domain.port.out.SimilarProductsRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+
 @Service
 public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase {
     private final SimilarProductsRepository repository;
@@ -23,7 +25,7 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
         final var ids = repository.findSimilarIds(id);
         final var products = ids.stream()
                 .map(getProductDetailUseCase::execute)
-                .toList();
+                .collect(Collectors.toSet());
         return new SimilarProducts(products);
     }
 }

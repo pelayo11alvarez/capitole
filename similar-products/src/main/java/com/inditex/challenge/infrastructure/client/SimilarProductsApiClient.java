@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class SimilarProductsApiClient implements SimilarProductsRepository {
@@ -25,7 +26,7 @@ public class SimilarProductsApiClient implements SimilarProductsRepository {
     }
 
     @Override
-    public List<ProductId> findSimilarIds(ProductId id) {
+    public Set<ProductId> findSimilarIds(ProductId id) {
         try {
             final var ids = webClient.get()
                     .uri("/product/{id}/similarids", id.value())

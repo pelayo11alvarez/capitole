@@ -1,17 +1,20 @@
 package com.inditex.challenge.domain.model.vo;
 
+import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 import com.inditex.challenge.domain.model.Product;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Set;
 
-public class SimilarProducts {
-    private final List<Product> products;
+import static com.inditex.challenge.domain.exception.constants.ExceptionConstants.SIMILAR_PRODUCTS_NULL_DESC;
 
-    public SimilarProducts(List<Product> products) {
-        this.products = List.copyOf(products);
-    }
-
-    public List<Product> getProducts() {
-        return products;
+public record SimilarProducts(Set<Product> products) {
+    public SimilarProducts {
+        if (Objects.isNull(products)) {
+            throw new ProductInvalidFieldException(SIMILAR_PRODUCTS_NULL_DESC);
+        }
+        products = Collections.unmodifiableSet(new LinkedHashSet<>(products));
     }
 }
