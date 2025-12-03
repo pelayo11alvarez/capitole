@@ -33,3 +33,14 @@ services:
       - K6_OUT=influxdb=http://influxdb:8086/k6
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: challenge-inditex:latest
+    container_name: challenge-inditex
+    ports:
+      - "5001:5000"
+    environment:
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -XX:+UseZGC"
