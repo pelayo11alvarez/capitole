@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ProductTest {
 
     @Test
-    void createInvalidProduct() {
+    void givenInvalidProductId_whenCreateInvalidProduct_thenThrow() {
         assertThrows((ProductInvalidFieldException.class),
                 () -> new Product(
                         null,
@@ -25,7 +25,31 @@ class ProductTest {
     }
 
     @Test
-    void createValidProduct() {
+    void givenInvalidProductName_whenCreateInvalidProduct_thenThrow() {
+        assertThrows((ProductInvalidFieldException.class),
+                () -> new Product(
+                        Instancio.create(ProductId.class),
+                        null,
+                        Instancio.create(ProductPrice.class),
+                        Instancio.create(boolean.class)
+                )
+        );
+    }
+
+    @Test
+    void givenInvalidProductPrice_whenCreateInvalidProduct_thenThrow() {
+        assertThrows((ProductInvalidFieldException.class),
+                () -> new Product(
+                        Instancio.create(ProductId.class),
+                        Instancio.create(ProductName.class),
+                        null,
+                        Instancio.create(boolean.class)
+                )
+        );
+    }
+
+    @Test
+    void givenValidProduct_whenCreateValidProduct_thenNotThrow() {
         final var productId = new ProductId(Instancio.create(String.class));
         assertDoesNotThrow(() -> new Product(
                 productId,

@@ -6,7 +6,7 @@ import static com.inditex.challenge.domain.exception.constants.ExceptionConstant
 
 public record ProductPrice(double value) {
     public ProductPrice {
-        if (value < 0) {
+        if (value <= 0) {
             throw new ProductInvalidFieldException(VALUE_PRODUCT_PRICE_NEGATIVE_DESC);
         }
     }
