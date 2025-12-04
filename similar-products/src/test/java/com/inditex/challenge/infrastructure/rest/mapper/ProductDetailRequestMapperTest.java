@@ -47,8 +47,8 @@ class ProductDetailRequestMapperTest {
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(product.getId().value(), result.getId()),
-                () -> assertEquals(product.getName(), result.getName()),
-                () -> assertEquals(product.getPrice(), Double.parseDouble(result.getPrice().toString())),
+                () -> assertEquals(product.getName().value(), result.getName()),
+                () -> assertEquals(product.getPrice().value(), Double.parseDouble(result.getPrice().toString())),
                 () -> assertEquals(product.isAvailable(), result.getAvailability())
         );
     }

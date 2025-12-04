@@ -2,6 +2,8 @@ package com.inditex.challenge.domain.model;
 
 import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 import com.inditex.challenge.domain.model.identity.ProductId;
+import com.inditex.challenge.domain.model.vo.ProductName;
+import com.inditex.challenge.domain.model.vo.ProductPrice;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +17,8 @@ class ProductTest {
         assertThrows((ProductInvalidFieldException.class),
                 () -> new Product(
                         null,
-                        Instancio.create(String.class),
-                        Instancio.create(double.class),
+                        Instancio.create(ProductName.class),
+                        Instancio.create(ProductPrice.class),
                         Instancio.create(boolean.class)
                 )
         );
@@ -27,8 +29,8 @@ class ProductTest {
         final var productId = new ProductId(Instancio.create(String.class));
         assertDoesNotThrow(() -> new Product(
                 productId,
-                Instancio.create(String.class),
-                Instancio.create(double.class),
+                Instancio.create(ProductName.class),
+                Instancio.create(ProductPrice.class),
                 Instancio.create(boolean.class)
         ));
     }

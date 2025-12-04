@@ -18,6 +18,8 @@ public interface ProductDetailRequestMapper {
     Set<ProductDetail> toProductDetailSet(Set<Product> products);
 
     @Mapping(target = "id", source = "product.id.value")
+    @Mapping(target = "name", source = "product.name.value")
+    @Mapping(target = "price", source = "product.price.value")
     @Mapping(target = "availability", source = "available")
     ProductDetail toProductDetail(Product product);
 }
