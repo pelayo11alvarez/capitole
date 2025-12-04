@@ -1,6 +1,6 @@
 package com.inditex.challenge.infrastructure.client.mapper;
 
-import com.inditex.challenge.domain.model.vo.ProductId;
+import com.inditex.challenge.domain.model.identity.ProductId;
 import org.mapstruct.Mapper;
 
 import java.util.Arrays;

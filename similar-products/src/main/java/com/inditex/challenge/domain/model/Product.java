@@ -1,7 +1,7 @@
 package com.inditex.challenge.domain.model;
 
 import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
-import com.inditex.challenge.domain.model.vo.ProductId;
+import com.inditex.challenge.domain.model.identity.ProductId;
 
 import java.util.Objects;
 

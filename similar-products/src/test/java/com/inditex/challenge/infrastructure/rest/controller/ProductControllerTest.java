@@ -1,6 +1,6 @@
 package com.inditex.challenge.infrastructure.rest.controller;
 
-import com.inditex.challenge.domain.model.vo.ProductId;
+import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.model.vo.SimilarProducts;
 import com.inditex.challenge.domain.port.in.GetSimilarProductsUseCase;
 import com.inditex.challenge.infrastructure.rest.api.model.ProductDetail;
@@ -31,7 +31,7 @@ class ProductControllerTest {
     @Mock
     private ProductDetailRequestMapper productDetailRequestMapper;
     @Mock
-    private ProductId productIdVO;
+    private ProductId productIdentity;
     @Mock
     private SimilarProducts similarProducts;
     @Mock
@@ -40,8 +40,8 @@ class ProductControllerTest {
     @Test
     void getProductSimilar() {
         final var productId = Instancio.create(String.class);
-        when(productIdRequestMapper.toProductId(productId)).thenReturn(productIdVO);
-        when(getSimilarProductsUseCase.execute(productIdVO)).thenReturn(similarProducts);
+        when(productIdRequestMapper.toProductId(productId)).thenReturn(productIdentity);
+        when(getSimilarProductsUseCase.execute(productIdentity)).thenReturn(similarProducts);
         when(productDetailRequestMapper.toProductDetailSet(similarProducts)).thenReturn(productDetailSet);
         final var result = controller.getProductSimilar(productId);
         assertAll(
@@ -50,7 +50,7 @@ class ProductControllerTest {
                 () -> assertEquals(productDetailSet, result.getBody())
         );
         verify(productIdRequestMapper, times(1)).toProductId(productId);
-        verify(getSimilarProductsUseCase, times(1)).execute(productIdVO);
+        verify(getSimilarProductsUseCase, times(1)).execute(productIdentity);
         verify(productDetailRequestMapper, times(1)).toProductDetailSet(similarProducts);
     }
 }

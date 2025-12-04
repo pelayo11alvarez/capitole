@@ -1,4 +1,4 @@
-package com.inditex.challenge.domain.model.vo;
+package com.inditex.challenge.domain.model.identity;
 
 import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 import org.instancio.Instancio;

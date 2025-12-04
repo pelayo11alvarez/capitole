@@ -1,7 +1,7 @@
 package com.inditex.challenge.infrastructure.client;
 
 import com.inditex.challenge.domain.exception.ProductNotFoundException;
-import com.inditex.challenge.domain.model.vo.ProductId;
+import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.port.out.SimilarProductsRepository;
 import com.inditex.challenge.infrastructure.client.mapper.ProductIdClientMapper;
 import org.springframework.stereotype.Service;

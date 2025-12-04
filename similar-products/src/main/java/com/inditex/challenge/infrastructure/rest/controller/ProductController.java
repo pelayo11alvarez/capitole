@@ -26,8 +26,8 @@ public class ProductController implements ProductApi {
 
     @Override
     public ResponseEntity<Set<ProductDetail>> getProductSimilar(String productId) {
-        final var productIdVO = productIdRequestMapper.toProductId(productId);
-        final var similarProducts = getSimilarProductsUseCase.execute(productIdVO);
+        final var productIdentity = productIdRequestMapper.toProductId(productId);
+        final var similarProducts = getSimilarProductsUseCase.execute(productIdentity);
         final var productDetails = productDetailRequestMapper.toProductDetailSet(similarProducts);
         return ResponseEntity.ok(productDetails);
     }

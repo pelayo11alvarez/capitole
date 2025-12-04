@@ -1,6 +1,6 @@
 package com.inditex.challenge.domain.port.out;
 
-import com.inditex.challenge.domain.model.vo.ProductId;
+import com.inditex.challenge.domain.model.identity.ProductId;
 
 import java.util.Set;
 

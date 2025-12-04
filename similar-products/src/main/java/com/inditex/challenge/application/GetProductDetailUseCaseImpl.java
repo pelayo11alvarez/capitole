@@ -2,7 +2,7 @@ package com.inditex.challenge.application;
 
 import com.inditex.challenge.domain.exception.ProductNotFoundException;
 import com.inditex.challenge.domain.model.Product;
-import com.inditex.challenge.domain.model.vo.ProductId;
+import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.port.in.GetProductDetailUseCase;
 import com.inditex.challenge.domain.port.out.ProductDetailRepository;
 import org.springframework.stereotype.Service;
