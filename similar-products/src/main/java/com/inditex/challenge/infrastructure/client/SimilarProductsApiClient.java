@@ -29,7 +29,7 @@ public class SimilarProductsApiClient implements SimilarProductsRepository {
             final var ids = webClient.get()
                     .uri("/product/{id}/similarids", id.value())
                     .retrieve()
-                    .bodyToMono(String[].class)
+                    .bodyToMono(long[].class)
                     .block();
 
             return productIdClientMapper.toProductIds(ids);

@@ -43,17 +43,17 @@ class SimilarProductsApiClientTest {
     @Test
     void givenProductId_whenFindSimilarIds_thenReturn() {
         //given
-        final var responseIds = new String[]{"111", "222", "333"};
+        final var responseIds = new long[]{111, 222, 333};
         final var expectedSet = Set.of(
-                new ProductId("111"),
-                new ProductId("222"),
-                new ProductId("333")
+                new ProductId(111),
+                new ProductId(222),
+                new ProductId(333)
         );
         when(webClient
                 .get()
                 .uri("/product/{id}/similarids", productId.value())
                 .retrieve()
-                .bodyToMono(String[].class)
+                .bodyToMono(long[].class)
                 .block()
         ).thenReturn(responseIds);
         when(productIdClientMapper.toProductIds(responseIds)).thenReturn(expectedSet);
@@ -68,17 +68,11 @@ class SimilarProductsApiClientTest {
     @Test
     void givenProductId_whenFindSimilarIds_thenThrowProductNotFoundException() {
         //given
-        final var responseIds = new String[]{"111", "222", "333"};
-        final var expectedSet = Set.of(
-                new ProductId("111"),
-                new ProductId("222"),
-                new ProductId("333")
-        );
         when(webClient
                 .get()
                 .uri("/product/{id}/similarids", productId.value())
                 .retrieve()
-                .bodyToMono(String[].class)
+                .bodyToMono(long[].class)
                 .block()
         ).thenThrow(
                 WebClientResponseException.create(
@@ -92,6 +86,6 @@ class SimilarProductsApiClientTest {
         //when /then
         assertThrows((ProductNotFoundException.class), () -> similarProductsApiClient.findSimilarIds(productId));
         verify(webClient, times(2)).get();
-        verify(productIdClientMapper, times(0)).toProductIds(responseIds);
+        verify(productIdClientMapper, times(0)).toProductIds(new long[]{111, 222, 333});
     }
 }

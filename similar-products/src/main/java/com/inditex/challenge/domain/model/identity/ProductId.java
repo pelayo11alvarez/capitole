@@ -2,14 +2,12 @@ package com.inditex.challenge.domain.model.identity;
 
 import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 
-import java.util.Objects;
+import static com.inditex.challenge.domain.exception.constants.ExceptionConstants.VALUE_PRODUCT_ID_NEGATIVE_DESC;
 
-import static com.inditex.challenge.domain.exception.constants.ExceptionConstants.VALUE_PRODUCT_ID_NULL_DESC;
-
-public record ProductId(String value) {
+public record ProductId(long value) {
     public ProductId {
-        if (Objects.isNull(value) || value.isBlank()) {
-            throw new ProductInvalidFieldException(VALUE_PRODUCT_ID_NULL_DESC);
+        if (value < 0) {
+            throw new ProductInvalidFieldException(VALUE_PRODUCT_ID_NEGATIVE_DESC);
         }
     }
 }

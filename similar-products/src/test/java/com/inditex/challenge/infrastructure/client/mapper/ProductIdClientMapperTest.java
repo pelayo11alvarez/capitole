@@ -17,7 +17,7 @@ class ProductIdClientMapperTest {
 
     @Test
     void toProductIds() {
-        final var ids = Instancio.create(String[].class);
+        final var ids = Instancio.create(long[].class);
         final var result = mapper.toProductIds(ids);
         assertAll(
                 () -> assertNotNull(result),

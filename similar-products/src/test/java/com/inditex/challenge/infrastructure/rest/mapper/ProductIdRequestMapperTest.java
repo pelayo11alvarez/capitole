@@ -16,8 +16,11 @@ class ProductIdRequestMapperTest {
 
     @Test
     void toProductId() {
-        final var id = Instancio.create(String.class);
-        final var result = mapper.toProductId(id);
+        //given
+        final var id = Instancio.create(long.class);
+        //when
+        final var result = mapper.toProductId(id.toString());
+        //then
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(id, result.value())

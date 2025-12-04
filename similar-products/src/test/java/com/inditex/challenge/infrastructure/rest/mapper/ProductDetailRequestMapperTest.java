@@ -46,7 +46,7 @@ class ProductDetailRequestMapperTest {
         final var result = mapper.toProductDetail(product);
         assertAll(
                 () -> assertNotNull(result),
-                () -> assertEquals(product.getId().value(), result.getId()),
+                () -> assertEquals(product.getId().value(), Long.parseLong(result.getId())),
                 () -> assertEquals(product.getName().value(), result.getName()),
                 () -> assertEquals(product.getPrice().value(), Double.parseDouble(result.getPrice().toString())),
                 () -> assertEquals(product.isAvailable(), result.getAvailability())

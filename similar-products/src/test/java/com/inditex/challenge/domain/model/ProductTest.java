@@ -50,7 +50,7 @@ class ProductTest {
 
     @Test
     void givenValidProduct_whenCreateValidProduct_thenNotThrow() {
-        final var productId = new ProductId(Instancio.create(String.class));
+        final var productId = new ProductId(Instancio.create(Long.class));
         assertDoesNotThrow(() -> new Product(
                 productId,
                 Instancio.create(ProductName.class),
