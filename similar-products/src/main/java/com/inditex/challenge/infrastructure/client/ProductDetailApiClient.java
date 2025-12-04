@@ -1,5 +1,6 @@
 package com.inditex.challenge.infrastructure.client;
 
+import com.inditex.challenge.domain.exception.ProductGenericException;
 import com.inditex.challenge.domain.exception.ProductNotFoundException;
 import com.inditex.challenge.domain.model.Product;
 import com.inditex.challenge.domain.model.identity.ProductId;
@@ -38,10 +39,10 @@ public class ProductDetailApiClient implements ProductDetailRepository {
                         if (HttpStatus.NOT_FOUND == clientResponse.statusCode()) {
                             return Mono.error(new ProductNotFoundException());
                         }
-                        return Mono.error(new /*ExternalServiceException*/Exception("4xx from product API"));
+                        return Mono.error(new ProductGenericException("4xx from product API"));
                     })
                     .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                            Mono.error(new /*ExternalServiceException*/Exception("5xx from product API")))
+                            Mono.error(new ProductGenericException("5xx from product API")))
                     .bodyToMono(ProductClientResponseDTO.class)
                     .block();
              final var product = productClientMapper.toDomain(response);

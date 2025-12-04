@@ -4,13 +4,13 @@ import com.inditex.challenge.domain.exception.ProductNotFoundException;
 import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.port.out.SimilarProductsRepository;
 import com.inditex.challenge.infrastructure.client.mapper.ProductIdClientMapper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Set;
 
-@Service
+@Component
 public class SimilarProductsApiClient implements SimilarProductsRepository {
     private static final String BASE_URL = "http://localhost:3001";
     private final WebClient webClient;
