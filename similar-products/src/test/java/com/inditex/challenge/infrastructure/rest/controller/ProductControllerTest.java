@@ -1,9 +1,10 @@
 package com.inditex.challenge.infrastructure.rest.controller;
 
+import com.inditex.challenge.application.workflow.SimilarProductsWorkFlow;
 import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.model.vo.SimilarProducts;
-import com.inditex.challenge.domain.port.in.GetSimilarProductsUseCase;
 import com.inditex.challenge.infrastructure.rest.api.model.ProductDetail;
+import com.inditex.challenge.infrastructure.rest.controller.ProductController;
 import com.inditex.challenge.infrastructure.rest.mapper.ProductDetailRequestMapper;
 import com.inditex.challenge.infrastructure.rest.mapper.ProductIdRequestMapper;
 import org.instancio.Instancio;
@@ -25,7 +26,7 @@ class ProductControllerTest {
     @InjectMocks
     private ProductController controller;
     @Mock
-    private GetSimilarProductsUseCase getSimilarProductsUseCase;
+    private SimilarProductsWorkFlow similarProductsWorkFlow;
     @Mock
     private ProductIdRequestMapper productIdRequestMapper;
     @Mock
@@ -38,19 +39,22 @@ class ProductControllerTest {
     private Set<ProductDetail> productDetailSet;
 
     @Test
-    void getProductSimilar() {
+    void givenProductId_whenGetProductSimilar_thenReturn() {
+        //given
         final var productId = Instancio.create(String.class);
         when(productIdRequestMapper.toProductId(productId)).thenReturn(productIdentity);
-        when(getSimilarProductsUseCase.execute(productIdentity)).thenReturn(similarProducts);
+        when(similarProductsWorkFlow.executeWorkFlow(productIdentity)).thenReturn(similarProducts);
         when(productDetailRequestMapper.toProductDetailSet(similarProducts)).thenReturn(productDetailSet);
+        //when
         final var result = controller.getProductSimilar(productId);
+        //then
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(HttpStatus.OK, result.getStatusCode()),
                 () -> assertEquals(productDetailSet, result.getBody())
         );
         verify(productIdRequestMapper, times(1)).toProductId(productId);
-        verify(getSimilarProductsUseCase, times(1)).execute(productIdentity);
+        verify(similarProductsWorkFlow, times(1)).executeWorkFlow(productIdentity);
         verify(productDetailRequestMapper, times(1)).toProductDetailSet(similarProducts);
     }
 }

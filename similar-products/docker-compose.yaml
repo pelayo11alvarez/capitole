@@ -43,4 +43,4 @@ services:
     ports:
       - "5001:5000"
     environment:
-      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -XX:+UseZGC"
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -XX:+UseZGC -Dserver.port=5000"

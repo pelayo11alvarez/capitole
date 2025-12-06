@@ -1,32 +1,38 @@
 package com.inditex.challenge.infrastructure.client;
 
+import com.inditex.challenge.domain.exception.ProductGenericException;
 import com.inditex.challenge.domain.exception.ProductNotFoundException;
 import com.inditex.challenge.domain.model.identity.ProductId;
+import com.inditex.challenge.domain.model.vo.SimilarProductsId;
 import com.inditex.challenge.infrastructure.client.mapper.ProductIdClientMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SimilarProductsApiClientTest {
 
+    @InjectMocks
     private SimilarProductsApiClient similarProductsApiClient;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private WebClient webClient;
     @Mock
-    private WebClient.Builder webClientBuilder;
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    @Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpec;
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
     @Mock
     private ProductIdClientMapper productIdClientMapper;
     @Mock
@@ -34,10 +40,12 @@ class SimilarProductsApiClientTest {
 
     @BeforeEach
     void setUp() {
-        when(webClient.mutate()).thenReturn(webClientBuilder);
-        when(webClientBuilder.baseUrl(anyString())).thenReturn(webClientBuilder);
-        when(webClientBuilder.build()).thenReturn(webClient);
-        similarProductsApiClient = new SimilarProductsApiClient(webClient, productIdClientMapper);
+        when(productId.value()).thenReturn(1L);
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri("/product/{id}/similarids", productId.value()))
+                .thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
     }
 
     @Test
@@ -49,43 +57,46 @@ class SimilarProductsApiClientTest {
                 new ProductId(222),
                 new ProductId(333)
         );
-        when(webClient
-                .get()
-                .uri("/product/{id}/similarids", productId.value())
-                .retrieve()
-                .bodyToMono(long[].class)
-                .block()
-        ).thenReturn(responseIds);
+        final var similarProducts = new SimilarProductsId(expectedSet);
+        when(responseSpec.bodyToMono(long[].class))
+                .thenReturn(Mono.just(responseIds));
         when(productIdClientMapper.toProductIds(responseIds)).thenReturn(expectedSet);
-        //when
-        Set<ProductId> result = similarProductsApiClient.findSimilarIds(productId);
-        //then
-        assertEquals(expectedSet, result);
-        verify(webClient, times(2)).get();
+        //when / then
+        assertEquals(similarProducts, similarProductsApiClient.findSimilarIds(productId));
+        verify(webClient, times(1)).get();
+        verify(requestHeadersUriSpec, times(1))
+                .uri("/product/{id}/similarids", productId.value());
+        verify(requestHeadersSpec, times(1)).retrieve();
         verify(productIdClientMapper, times(1)).toProductIds(responseIds);
     }
 
     @Test
     void givenProductId_whenFindSimilarIds_thenThrowProductNotFoundException() {
         //given
-        when(webClient
-                .get()
-                .uri("/product/{id}/similarids", productId.value())
-                .retrieve()
-                .bodyToMono(long[].class)
-                .block()
-        ).thenThrow(
-                WebClientResponseException.create(
-                        404,
-                        "Not Found",
-                        null,
-                        null,
-                        null
-                )
-        );
+        when(responseSpec.bodyToMono(long[].class))
+                .thenReturn(Mono.error(new ProductNotFoundException()));
         //when /then
         assertThrows((ProductNotFoundException.class), () -> similarProductsApiClient.findSimilarIds(productId));
-        verify(webClient, times(2)).get();
-        verify(productIdClientMapper, times(0)).toProductIds(new long[]{111, 222, 333});
+        verify(webClient, times(1)).get();
+        verify(webClient, times(1)).get();
+        verify(requestHeadersUriSpec, times(1))
+                .uri("/product/{id}/similarids", productId.value());
+        verify(requestHeadersSpec, times(1)).retrieve();
+        verifyNoInteractions(productIdClientMapper);
+    }
+
+    @Test
+    void givenProductId_whenFindSimilarIds_thenThrowProductGenericException() {
+        //given
+        when(responseSpec.bodyToMono(long[].class))
+                .thenReturn(Mono.error(new ProductGenericException("")));
+        //when /then
+        assertThrows((ProductGenericException.class), () -> similarProductsApiClient.findSimilarIds(productId));
+        verify(webClient, times(1)).get();
+        verify(webClient, times(1)).get();
+        verify(requestHeadersUriSpec, times(1))
+                .uri("/product/{id}/similarids", productId.value());
+        verify(requestHeadersSpec, times(1)).retrieve();
+        verifyNoInteractions(productIdClientMapper);
     }
 }

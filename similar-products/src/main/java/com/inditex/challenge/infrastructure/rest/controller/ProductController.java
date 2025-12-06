@@ -1,6 +1,6 @@
 package com.inditex.challenge.infrastructure.rest.controller;
 
-import com.inditex.challenge.domain.port.in.GetSimilarProductsUseCase;
+import com.inditex.challenge.application.workflow.SimilarProductsWorkFlow;
 import com.inditex.challenge.infrastructure.rest.api.ProductApi;
 import com.inditex.challenge.infrastructure.rest.api.model.ProductDetail;
 import com.inditex.challenge.infrastructure.rest.mapper.ProductDetailRequestMapper;
@@ -12,14 +12,14 @@ import java.util.Set;
 
 @RestController
 public class ProductController implements ProductApi {
-    private final GetSimilarProductsUseCase getSimilarProductsUseCase;
+    private final SimilarProductsWorkFlow similarProductsWorkFlow;
     private final ProductIdRequestMapper productIdRequestMapper;
     private final ProductDetailRequestMapper productDetailRequestMapper;
 
-    public ProductController(GetSimilarProductsUseCase getSimilarProductsUseCase,
+    public ProductController(SimilarProductsWorkFlow similarProductsWorkFlow,
                              ProductIdRequestMapper productIdRequestMapper,
                              ProductDetailRequestMapper productDetailRequestMapper) {
-        this.getSimilarProductsUseCase = getSimilarProductsUseCase;
+        this.similarProductsWorkFlow = similarProductsWorkFlow;
         this.productIdRequestMapper = productIdRequestMapper;
         this.productDetailRequestMapper = productDetailRequestMapper;
     }
@@ -27,7 +27,7 @@ public class ProductController implements ProductApi {
     @Override
     public ResponseEntity<Set<ProductDetail>> getProductSimilar(String productId) {
         final var productIdentity = productIdRequestMapper.toProductId(productId);
-        final var similarProducts = getSimilarProductsUseCase.execute(productIdentity);
+        final var similarProducts = similarProductsWorkFlow.executeWorkFlow(productIdentity);
         final var productDetails = productDetailRequestMapper.toProductDetailSet(similarProducts);
         return ResponseEntity.ok(productDetails);
     }
