@@ -1,12 +1,10 @@
 package com.inditex.challenge.application.usecase;
 
-import com.inditex.challenge.application.usecase.GetSimilarProductsUseCaseImpl;
-import com.inditex.challenge.domain.exception.ProductGenericException;
+import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 import com.inditex.challenge.domain.model.Product;
 import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.model.vo.SimilarProductsId;
 import com.inditex.challenge.domain.port.out.ProductDetailRepository;
-import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -54,8 +52,8 @@ class GetSimilarProductsUseCaseImplTest {
 
     @ParameterizedTest
     @MethodSource("similarProductsIdProvider")
-    void givenNotValidSimilarProductsId_whenFindById_thenReturn(SimilarProductsId similarProductsId) {
-        assertThrows((ProductGenericException.class), () -> useCase.execute(similarProductsId));
+    void givenNotValidSimilarProductsId_whenFindById_thenReturnProductInvalidFieldException(SimilarProductsId similarProductsId) {
+        assertThrows((ProductInvalidFieldException.class), () -> useCase.execute(similarProductsId));
     }
 
     static Stream<Arguments> similarProductsIdProvider() {

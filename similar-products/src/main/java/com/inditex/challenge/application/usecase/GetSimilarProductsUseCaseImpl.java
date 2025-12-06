@@ -1,6 +1,6 @@
 package com.inditex.challenge.application.usecase;
 
-import com.inditex.challenge.domain.exception.ProductGenericException;
+import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 import com.inditex.challenge.domain.model.vo.SimilarProducts;
 import com.inditex.challenge.domain.model.vo.SimilarProductsId;
 import com.inditex.challenge.domain.port.in.GetSimilarProductsUseCase;
@@ -10,6 +10,8 @@ import reactor.core.publisher.Flux;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.inditex.challenge.domain.exception.constants.ExceptionConstants.SIMILAR_PRODUCTS_NULL_DESC;
 
 @Service
 public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase {
@@ -31,7 +33,7 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
 
     private void validateSimilarProductsId(SimilarProductsId similarProductsId) {
         if (Objects.isNull(similarProductsId) || similarProductsId.values().isEmpty()) {
-            throw new ProductGenericException("");
+            throw new ProductInvalidFieldException(SIMILAR_PRODUCTS_NULL_DESC);
         }
     }
 }

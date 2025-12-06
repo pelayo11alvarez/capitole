@@ -1,7 +1,6 @@
 package com.inditex.challenge.application.usecase;
 
-import com.inditex.challenge.application.usecase.GetSimilarProductsIdUseCaseImpl;
-import com.inditex.challenge.domain.exception.ProductGenericException;
+import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.model.vo.SimilarProductsId;
 import com.inditex.challenge.domain.port.out.SimilarProductsRepository;
@@ -40,9 +39,9 @@ class GetSimilarProductsIdUseCaseImplTest {
     }
 
     @Test
-    void givenNullProductId_whenFindSimilarIds_thenProductGenericException() {
+    void givenNullProductId_whenFindSimilarIds_thenProductInvalidFieldException() {
         //given /when /then
-        assertThrows((ProductGenericException.class), () -> useCase.execute(null));
+        assertThrows((ProductInvalidFieldException.class), () -> useCase.execute(null));
         verifyNoInteractions(repository);
     }
 }

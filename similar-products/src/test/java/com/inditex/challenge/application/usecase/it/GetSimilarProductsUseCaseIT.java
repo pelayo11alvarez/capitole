@@ -1,5 +1,6 @@
 package com.inditex.challenge.application.usecase.it;
 
+import com.inditex.challenge.domain.exception.ProductInvalidFieldException;
 import com.inditex.challenge.domain.model.Product;
 import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.model.vo.SimilarProductsId;
@@ -67,5 +68,14 @@ class GetSimilarProductsUseCaseIT {
                 () -> assertTrue(result.products().isEmpty())
         );
         verify(repository, times(1)).findById(productId);
+    }
+
+    @Test
+    void givenNoSimilarIds_whenExecute_thenThrowsProductInvalidFieldException() {
+        //given /when
+        assertThrows((ProductInvalidFieldException.class),
+                () -> getSimilarProductsUseCase.execute(null));
+        // then
+        verifyNoInteractions(repository);
     }
 }
