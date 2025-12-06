@@ -15,7 +15,7 @@ class ProductIdRequestMapperTest {
     private ProductIdRequestMapperImpl mapper;
 
     @Test
-    void toProductId() {
+    void givenId_whenMapTtoProductId_thenReturnProductId() {
         //given
         final var id = Instancio.create(long.class);
         //when

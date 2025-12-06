@@ -65,7 +65,7 @@ class ProductControllerITTest {
     }
 
     @Test
-    void givenNonExistingProductId_whenGetProductSimilar_thenReturnNotFound() throws Exception {
+    void givenNonExistingProductId_whenGetProductSimilar_thenReturnNotFound() {
         //given
         final var productId = 999L;
         ProductId domainId = new ProductId(productId);

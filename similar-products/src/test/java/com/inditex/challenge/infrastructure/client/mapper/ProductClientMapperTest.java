@@ -28,7 +28,7 @@ class ProductClientMapperTest {
     private ProductPriceClientMapper productPriceClientMapper;
 
     @Test
-    void toDomain() {
+    void givenDto_whenMappToDomain_thenReturnProduct() {
         //given
         final var dto = Instancio.of(ProductClientResponseDTO.class)
                 .set(field(ProductClientResponseDTO::id), "1")

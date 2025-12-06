@@ -4,7 +4,7 @@ import com.inditex.challenge.domain.exception.ProductGenericException;
 import com.inditex.challenge.domain.exception.ProductNotFoundException;
 import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.model.vo.SimilarProductsId;
-import com.inditex.challenge.infrastructure.client.mapper.ProductIdClientMapper;
+import com.inditex.challenge.infrastructure.client.mapper.SimilarProductsIdMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +34,7 @@ class SimilarProductsApiClientTest {
     @Mock
     private WebClient.ResponseSpec responseSpec;
     @Mock
-    private ProductIdClientMapper productIdClientMapper;
+    private SimilarProductsIdMapper similarProductsIdMapper;
     @Mock
     private ProductId productId;
 
@@ -60,14 +60,14 @@ class SimilarProductsApiClientTest {
         final var similarProducts = new SimilarProductsId(expectedSet);
         when(responseSpec.bodyToMono(long[].class))
                 .thenReturn(Mono.just(responseIds));
-        when(productIdClientMapper.toProductIds(responseIds)).thenReturn(expectedSet);
+        when(similarProductsIdMapper.toSimilarProductsId(responseIds)).thenReturn(similarProducts);
         //when / then
         assertEquals(similarProducts, similarProductsApiClient.findSimilarIds(productId));
         verify(webClient, times(1)).get();
         verify(requestHeadersUriSpec, times(1))
                 .uri("/product/{id}/similarids", productId.value());
         verify(requestHeadersSpec, times(1)).retrieve();
-        verify(productIdClientMapper, times(1)).toProductIds(responseIds);
+        verify(similarProductsIdMapper, times(1)).toSimilarProductsId(responseIds);
     }
 
     @Test
@@ -82,7 +82,7 @@ class SimilarProductsApiClientTest {
         verify(requestHeadersUriSpec, times(1))
                 .uri("/product/{id}/similarids", productId.value());
         verify(requestHeadersSpec, times(1)).retrieve();
-        verifyNoInteractions(productIdClientMapper);
+        verifyNoInteractions(similarProductsIdMapper);
     }
 
     @Test
@@ -97,6 +97,6 @@ class SimilarProductsApiClientTest {
         verify(requestHeadersUriSpec, times(1))
                 .uri("/product/{id}/similarids", productId.value());
         verify(requestHeadersSpec, times(1)).retrieve();
-        verifyNoInteractions(productIdClientMapper);
+        verifyNoInteractions(similarProductsIdMapper);
     }
 }

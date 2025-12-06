@@ -16,7 +16,17 @@ class ProductIdClientMapperTest {
     private ProductIdClientMapperImpl mapper;
 
     @Test
-    void toProductIds() {
+    void givenId_whenMappToProductId_thenReturnProductId() {
+        final var id = Instancio.create(long.class).toString();
+        final var result = mapper.toProductId(id);
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertEquals(Long.parseLong(id), result.value())
+        );
+    }
+
+    @Test
+    void givenIds_whenMappToProductIds_thenReturnSetProductId() {
         final var ids = Instancio.create(long[].class);
         final var result = mapper.toProductIds(ids);
         assertAll(

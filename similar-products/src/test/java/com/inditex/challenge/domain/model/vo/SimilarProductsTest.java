@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class SimilarProductsTest {
 
     @Test
-    void createInvalidSimilarProducts() {
+    void givenNullProduct_whenCreateInvalidSimilarProducts_thenThrowProductInvalidFieldException() {
         assertThrows((ProductInvalidFieldException.class),
                 () -> new SimilarProducts(null));
     }
 
     @Test
-    void createValidSimilarProducts() {
+    void givenProduct_whenCreateValidSimilarProducts_thenReturnSimilarProducts() {
         final var products = Instancio.createSet(Product.class);
         assertDoesNotThrow(() -> new SimilarProducts(products));
     }

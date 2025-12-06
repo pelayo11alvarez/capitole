@@ -9,7 +9,6 @@ public interface ProductPriceClientMapper {
 
     @Mapping(target = "value", expression = "java(stringToDouble(price))")
     ProductPrice toProductPrice(String price);
-
     default double stringToDouble(String value) {
         return Double.parseDouble(value);
     }

@@ -13,10 +13,5 @@ public interface ProductIdClientMapper {
 
     @Mapping(target = "value", source = "id")
     ProductId toProductId(String id);
-
-    default Set<ProductId> toProductIds(long[] ids) {
-        return Arrays.stream(ids)
-                .mapToObj(ProductId::new)
-                .collect(Collectors.toSet());
-    }
+    Set<ProductId> toProductIds(long[] ids);
 }

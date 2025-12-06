@@ -31,12 +31,13 @@ class GetSimilarProductsUseCaseImplTest {
     @Mock
     private ProductDetailRepository repository;
     @Mock
+    private ProductId productId;
+    @Mock
     private Product product;
 
     @Test
     void givenSimilarProductsId_whenFindById_thenReturnSimilarProducts() {
         //given
-        final var productId = Instancio.create(ProductId.class);
         final var similarProductsId = new SimilarProductsId(Set.of(productId));
         when(repository.findById(productId)).thenReturn(Mono.just(product));
         //when

@@ -17,7 +17,7 @@ class ProductDetailRequestMapperTest {
     private ProductDetailRequestMapperImpl mapper;
 
     @Test
-    void toProductDetailSet() {
+    void givenSimilarProducts_whenMappToProductDetailSet_thenReturnSetProductDetail() {
         final var similarProducts = Instancio.create(SimilarProducts.class);
         final var result = mapper.toProductDetailSet(similarProducts);
         assertAll(
@@ -28,7 +28,7 @@ class ProductDetailRequestMapperTest {
     }
 
     @Test
-    void testToProductDetailSet() {
+    void givenSetProduct_whenMappToProductDetailSet_thenReturnSetProductDetail() {
         final var products = Instancio.ofSet(Product.class)
                 .size(1)
                 .create();
@@ -41,7 +41,7 @@ class ProductDetailRequestMapperTest {
     }
 
     @Test
-    void toProductDetail() {
+    void givenProduct_whenMappToProductDetail_thenReturnProductDetail() {
         final var product = Instancio.create(Product.class);
         final var result = mapper.toProductDetail(product);
         assertAll(
