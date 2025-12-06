@@ -8,6 +8,7 @@ import com.inditex.challenge.domain.model.vo.SimilarProductsId;
 import com.inditex.challenge.domain.port.out.SimilarProductsRepository;
 import com.inditex.challenge.infrastructure.client.mapper.ProductIdClientMapper;
 import com.inditex.challenge.infrastructure.client.mapper.SimilarProductsIdMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -22,16 +23,20 @@ import java.util.Set;
 public class SimilarProductsApiClient implements SimilarProductsRepository {
     private final WebClient webClient;
     private final SimilarProductsIdMapper similarProductsIdMapper;
+    private final String similarProductSimuladoUrl;
 
-    public SimilarProductsApiClient(WebClient webClient, SimilarProductsIdMapper similarProductsIdMapper) {
+    public SimilarProductsApiClient(WebClient webClient, SimilarProductsIdMapper similarProductsIdMapper,
+                                    @Value("${spring.infrastructure.similar-product.url}")
+                                    String similarProductSimuladoUrl) {
         this.webClient = webClient;
         this.similarProductsIdMapper = similarProductsIdMapper;
+        this.similarProductSimuladoUrl = similarProductSimuladoUrl;
     }
 
     @Override
     public SimilarProductsId findSimilarIds(ProductId id) {
         return webClient.get()
-                .uri("/product/{id}/similarids", id.value())
+                .uri(similarProductSimuladoUrl, id.value())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
                     if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {

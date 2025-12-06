@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SimilarProductsApiClientTest {
 
+    private static final String PRODUCT_DETAIL_SIMULADO_URL = "/product/{id}/similarids";
     @InjectMocks
     private SimilarProductsApiClient similarProductsApiClient;
     @Mock
@@ -40,9 +42,10 @@ class SimilarProductsApiClientTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(similarProductsApiClient, "similarProductSimuladoUrl", "/product/{id}/similarids");
         when(productId.value()).thenReturn(1L);
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri("/product/{id}/similarids", productId.value()))
+        when(requestHeadersUriSpec.uri(PRODUCT_DETAIL_SIMULADO_URL, productId.value()))
                 .thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
@@ -65,7 +68,7 @@ class SimilarProductsApiClientTest {
         assertEquals(similarProducts, similarProductsApiClient.findSimilarIds(productId));
         verify(webClient, times(1)).get();
         verify(requestHeadersUriSpec, times(1))
-                .uri("/product/{id}/similarids", productId.value());
+                .uri(PRODUCT_DETAIL_SIMULADO_URL, productId.value());
         verify(requestHeadersSpec, times(1)).retrieve();
         verify(similarProductsIdMapper, times(1)).toSimilarProductsId(responseIds);
     }
@@ -80,7 +83,7 @@ class SimilarProductsApiClientTest {
         verify(webClient, times(1)).get();
         verify(webClient, times(1)).get();
         verify(requestHeadersUriSpec, times(1))
-                .uri("/product/{id}/similarids", productId.value());
+                .uri(PRODUCT_DETAIL_SIMULADO_URL, productId.value());
         verify(requestHeadersSpec, times(1)).retrieve();
         verifyNoInteractions(similarProductsIdMapper);
     }
@@ -95,7 +98,7 @@ class SimilarProductsApiClientTest {
         verify(webClient, times(1)).get();
         verify(webClient, times(1)).get();
         verify(requestHeadersUriSpec, times(1))
-                .uri("/product/{id}/similarids", productId.value());
+                .uri(PRODUCT_DETAIL_SIMULADO_URL, productId.value());
         verify(requestHeadersSpec, times(1)).retrieve();
         verifyNoInteractions(similarProductsIdMapper);
     }
