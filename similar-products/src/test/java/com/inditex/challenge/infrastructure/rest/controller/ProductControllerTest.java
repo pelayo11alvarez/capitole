@@ -4,7 +4,6 @@ import com.inditex.challenge.application.workflow.SimilarProductsWorkFlow;
 import com.inditex.challenge.domain.model.identity.ProductId;
 import com.inditex.challenge.domain.model.vo.SimilarProducts;
 import com.inditex.challenge.infrastructure.rest.api.model.ProductDetail;
-import com.inditex.challenge.infrastructure.rest.controller.ProductController;
 import com.inditex.challenge.infrastructure.rest.mapper.ProductDetailRequestMapper;
 import com.inditex.challenge.infrastructure.rest.mapper.ProductIdRequestMapper;
 import org.instancio.Instancio;

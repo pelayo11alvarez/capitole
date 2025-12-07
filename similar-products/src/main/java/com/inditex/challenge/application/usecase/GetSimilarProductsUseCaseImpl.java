@@ -24,10 +24,12 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
     @Override
     public SimilarProducts execute(SimilarProductsId similarProductsId) {
         validateSimilarProductsId(similarProductsId);
-        final var products = Flux.fromIterable(similarProductsId.values())
-                                .flatMap(repository::findById)
-                                .collect(Collectors.toSet())
-                                .block();
+        final var productFluxes = similarProductsId.values().stream()
+                .map(repository::findById)
+                .toList();
+        final var products = Flux.merge(productFluxes)
+                .collect(Collectors.toSet())
+                .block();
         return new SimilarProducts(products);
     }
 
