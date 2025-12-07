@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.7</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com.inditex.challenge</groupId>
 	<artifactId>similar-products</artifactId>
@@ -33,6 +33,10 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<swagger-annotations.version>2.2.22</swagger-annotations.version>
 		<jackson-databind.version>0.2.6</jackson-databind.version>
+		<jacoco.version>0.8.11</jacoco.version>
+		<compiler.version>3.13.0</compiler.version>
+		<mapstruct.version>1.5.5.Final</mapstruct.version>
+		<openapi-generator.version>7.5.0</openapi-generator.version>
 		<equalsverifier.version>4.2.2</equalsverifier.version>
 		<instancio.version>5.5.1</instancio.version>
 	</properties>
@@ -108,18 +112,48 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>**com/inditex/challenge/config/*</exclude>
+								<exclude>**com/inditex/challenge/infrastructure/client/config/*</exclude>
+								<exclude>**com/inditex/challenge/infrastructure/rest/model/*</exclude>
+								<exclude>**com/inditex/challenge/infrastructure/rest/config/*</exclude>
+								<exclude>**com/inditex/challenge/infrastructure/rest/api/*</exclude>
+								<exclude>**com/inditex/challenge/infrastructure/rest/api/model/*</exclude>
+								<exclude>**com/inditex/challenge/SimilarProductsApplication.class</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.13.0</version>
+				<version>${compiler.version}</version>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
-					<release>21</release>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<release>${java.version}</release>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
-							<version>1.5.5.Final</version>
+							<version>${mapstruct.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -128,7 +162,7 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>7.5.0</version>
+				<version>${openapi-generator.version}</version>
 				<executions>
 					<execution>
 						<id>generate-similar-products-api</id>

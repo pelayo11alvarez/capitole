@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -93,6 +94,21 @@ class SimilarProductsApiClientTest {
         //given
         when(responseSpec.bodyToMono(long[].class))
                 .thenReturn(Mono.error(new ProductGenericException("")));
+        //when /then
+        assertThrows((ProductGenericException.class), () -> similarProductsApiClient.findSimilarIds(productId));
+        verify(webClient, times(1)).get();
+        verify(webClient, times(1)).get();
+        verify(requestHeadersUriSpec, times(1))
+                .uri(PRODUCT_DETAIL_SIMULADO_URL, productId.value());
+        verify(requestHeadersSpec, times(1)).retrieve();
+        verifyNoInteractions(similarProductsIdMapper);
+    }
+
+    @Test
+    void givenProductId_whenFindSimilarIds_thenThrowTimeoutException() {
+        //given
+        when(responseSpec.bodyToMono(long[].class))
+                .thenReturn(Mono.error(new TimeoutException("")));
         //when /then
         assertThrows((ProductGenericException.class), () -> similarProductsApiClient.findSimilarIds(productId));
         verify(webClient, times(1)).get();

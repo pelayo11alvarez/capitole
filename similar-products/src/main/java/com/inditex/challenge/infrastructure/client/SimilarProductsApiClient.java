@@ -3,21 +3,20 @@ package com.inditex.challenge.infrastructure.client;
 import com.inditex.challenge.domain.exception.ProductGenericException;
 import com.inditex.challenge.domain.exception.ProductNotFoundException;
 import com.inditex.challenge.domain.model.identity.ProductId;
-import com.inditex.challenge.domain.model.vo.SimilarProducts;
 import com.inditex.challenge.domain.model.vo.SimilarProductsId;
 import com.inditex.challenge.domain.port.out.SimilarProductsRepository;
-import com.inditex.challenge.infrastructure.client.mapper.ProductIdClientMapper;
 import com.inditex.challenge.infrastructure.client.mapper.SimilarProductsIdMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Set;
+import java.util.concurrent.TimeoutException;
+
+import static com.inditex.challenge.domain.exception.constants.ExceptionConstants.*;
 
 @Component
 public class SimilarProductsApiClient implements SimilarProductsRepository {
@@ -42,12 +41,14 @@ public class SimilarProductsApiClient implements SimilarProductsRepository {
                     if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
                         return Mono.error(new ProductNotFoundException());
                     }
-                    return Mono.error(new ProductGenericException("4xx from product API"));
+                    return Mono.error(new ProductGenericException(GENERIC_CLIENT_ERROR));
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                        Mono.error(new ProductGenericException("5xx from product API")))
+                        Mono.error(new ProductGenericException(GENERIC_INTERNAL_ERROR)))
                 .bodyToMono(long[].class)
                 .timeout(Duration.ofSeconds(2))
+                .onErrorMap(TimeoutException.class,
+                        ex -> new ProductGenericException(GENERIC_TIMEOUT_ERROR))
                 .map(similarProductsIdMapper::toSimilarProductsId)
                 .block();
     }

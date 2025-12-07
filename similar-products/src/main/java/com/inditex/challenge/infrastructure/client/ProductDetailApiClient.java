@@ -15,6 +15,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.concurrent.TimeoutException;
+
+import static com.inditex.challenge.domain.exception.constants.ExceptionConstants.*;
 
 @Component
 public class ProductDetailApiClient implements ProductDetailRepository {
@@ -39,12 +42,14 @@ public class ProductDetailApiClient implements ProductDetailRepository {
                     if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
                         return Mono.error(new ProductNotFoundException());
                     }
-                    return Mono.error(new ProductGenericException("4xx from product API"));
+                    return Mono.error(new ProductGenericException(GENERIC_CLIENT_ERROR));
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                        Mono.error(new ProductGenericException("5xx from product API")))
+                        Mono.error(new ProductGenericException(GENERIC_INTERNAL_ERROR)))
                 .bodyToMono(ProductClientResponseDTO.class)
                 .timeout(Duration.ofSeconds(2))
+                .onErrorMap(TimeoutException.class,
+                        ex -> new ProductGenericException(GENERIC_TIMEOUT_ERROR))
                 .map(productClientMapper::toDomain);
     }
 }

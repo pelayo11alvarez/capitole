@@ -17,6 +17,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.concurrent.TimeoutException;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -96,6 +98,23 @@ class ProductDetailApiClientTest {
         //given
         when(responseSpec.bodyToMono(ProductClientResponseDTO.class))
                 .thenReturn(Mono.error(new ProductGenericException("")));
+
+        //when / then
+        StepVerifier.create(productDetailApiClient.findById(productId))
+                .expectError(ProductGenericException.class)
+                .verify();
+
+        verify(webClient, times(1)).get();
+        verify(requestHeadersUriSpec, times(1)).uri(PRODUCT_DETAIL_SIMULADO_URL, 1L);
+        verify(requestHeadersSpec, times(1)).retrieve();
+        verifyNoInteractions(productClientMapper);
+    }
+
+    @Test
+    void givenProductId_whenFindById_thenThrowTimeoutException() {
+        //given
+        when(responseSpec.bodyToMono(ProductClientResponseDTO.class))
+                .thenReturn(Mono.error(new TimeoutException("")));
 
         //when / then
         StepVerifier.create(productDetailApiClient.findById(productId))
