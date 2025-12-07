@@ -6,5 +6,7 @@ spring:
       base-url: http://simulado:80
     similar-product:
       url: /product/{id}/similarids
+      timeout: 2
     product-detail:
       url: /product/{id}
+      timeout: 2

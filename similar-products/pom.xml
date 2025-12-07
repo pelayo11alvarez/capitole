@@ -37,6 +37,7 @@
 		<compiler.version>3.13.0</compiler.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<openapi-generator.version>7.5.0</openapi-generator.version>
+		<mock-web-server.version>4.12.0</mock-web-server.version>
 		<equalsverifier.version>4.2.2</equalsverifier.version>
 		<instancio.version>5.5.1</instancio.version>
 	</properties>
@@ -101,6 +102,12 @@
 			<groupId>org.instancio</groupId>
 			<artifactId>instancio-junit</artifactId>
 			<version>${instancio.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>${mock-web-server.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

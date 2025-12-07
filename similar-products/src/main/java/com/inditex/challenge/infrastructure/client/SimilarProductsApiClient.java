@@ -23,13 +23,17 @@ public class SimilarProductsApiClient implements SimilarProductsRepository {
     private final WebClient webClient;
     private final SimilarProductsIdMapper similarProductsIdMapper;
     private final String similarProductSimuladoUrl;
+    private final int timeout;
 
     public SimilarProductsApiClient(WebClient webClient, SimilarProductsIdMapper similarProductsIdMapper,
                                     @Value("${spring.infrastructure.similar-product.url}")
-                                    String similarProductSimuladoUrl) {
+                                    String similarProductSimuladoUrl,
+                                    @Value("${spring.infrastructure.product-detail.timeout}")
+                                    int timeout) {
         this.webClient = webClient;
         this.similarProductsIdMapper = similarProductsIdMapper;
         this.similarProductSimuladoUrl = similarProductSimuladoUrl;
+        this.timeout = timeout;
     }
 
     @Override
@@ -46,7 +50,7 @@ public class SimilarProductsApiClient implements SimilarProductsRepository {
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
                         Mono.error(new ProductGenericException(GENERIC_INTERNAL_ERROR)))
                 .bodyToMono(long[].class)
-                .timeout(Duration.ofSeconds(2))
+                .timeout(Duration.ofSeconds(timeout))
                 .onErrorMap(TimeoutException.class,
                         ex -> new ProductGenericException(GENERIC_TIMEOUT_ERROR))
                 .map(similarProductsIdMapper::toSimilarProductsId)

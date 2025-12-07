@@ -8,10 +8,8 @@ import com.inditex.challenge.infrastructure.client.mapper.SimilarProductsIdMappe
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +24,7 @@ import static org.mockito.Mockito.*;
 class SimilarProductsApiClientTest {
 
     private static final String PRODUCT_DETAIL_SIMULADO_URL = "/product/{id}/similarids";
-    @InjectMocks
+    private static final int TIME_OUT = 2;
     private SimilarProductsApiClient similarProductsApiClient;
     @Mock
     private WebClient webClient;
@@ -43,7 +41,12 @@ class SimilarProductsApiClientTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(similarProductsApiClient, "similarProductSimuladoUrl", "/product/{id}/similarids");
+        this.similarProductsApiClient = new SimilarProductsApiClient(
+                webClient,
+                similarProductsIdMapper,
+                PRODUCT_DETAIL_SIMULADO_URL,
+                TIME_OUT
+        );
         when(productId.value()).thenReturn(1L);
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(PRODUCT_DETAIL_SIMULADO_URL, productId.value()))

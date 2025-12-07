@@ -9,10 +9,8 @@ import com.inditex.challenge.infrastructure.client.mapper.ProductClientMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -26,7 +24,7 @@ import static org.mockito.Mockito.*;
 class ProductDetailApiClientTest {
 
     private static final String PRODUCT_DETAIL_SIMULADO_URL = "/product/{id}";
-    @InjectMocks
+    private static final int TIME_OUT = 2;
     private ProductDetailApiClient productDetailApiClient;
     @Mock
     private WebClient webClient;
@@ -47,7 +45,12 @@ class ProductDetailApiClientTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(productDetailApiClient, "productDetailSimuladoUrl", "/product/{id}");
+        this.productDetailApiClient = new ProductDetailApiClient(
+                webClient,
+                productClientMapper,
+                PRODUCT_DETAIL_SIMULADO_URL,
+                TIME_OUT
+        );
         when(productId.value()).thenReturn(1L);
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(PRODUCT_DETAIL_SIMULADO_URL, 1L)).thenReturn(requestHeadersSpec);

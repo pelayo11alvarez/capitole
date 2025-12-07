@@ -24,13 +24,17 @@ public class ProductDetailApiClient implements ProductDetailRepository {
     private final WebClient webClient;
     private final ProductClientMapper productClientMapper;
     private final String productDetailSimuladoUrl;
+    private final int timeout;
 
     public ProductDetailApiClient(WebClient webClient, ProductClientMapper productClientMapper,
                                   @Value("${spring.infrastructure.product-detail.url}")
-                                  String productDetailSimuladoUrl) {
+                                  String productDetailSimuladoUrl,
+                                  @Value("${spring.infrastructure.product-detail.timeout}")
+                                  int timeout) {
         this.webClient = webClient;
         this.productClientMapper = productClientMapper;
         this.productDetailSimuladoUrl = productDetailSimuladoUrl;
+        this.timeout = timeout;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class ProductDetailApiClient implements ProductDetailRepository {
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
                         Mono.error(new ProductGenericException(GENERIC_INTERNAL_ERROR)))
                 .bodyToMono(ProductClientResponseDTO.class)
-                .timeout(Duration.ofSeconds(2))
+                .timeout(Duration.ofSeconds(timeout))
                 .onErrorMap(TimeoutException.class,
                         ex -> new ProductGenericException(GENERIC_TIMEOUT_ERROR))
                 .map(productClientMapper::toDomain);
