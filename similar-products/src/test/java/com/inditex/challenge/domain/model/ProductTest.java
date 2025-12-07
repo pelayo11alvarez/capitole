@@ -7,8 +7,7 @@ import com.inditex.challenge.domain.model.vo.ProductPrice;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ProductTest {
 
@@ -57,5 +56,14 @@ class ProductTest {
                 Instancio.create(ProductPrice.class),
                 Instancio.create(boolean.class)
         ));
+    }
+
+    @Test
+    void givenProduct_whenCompareEquals_thenValidate() {
+        var product1 = Instancio.create(Product.class);
+        var product2 = Instancio.create(Product.class);
+        assertEquals(product1, product1);
+        assertNotEquals(product1, product2);
+        assertNotEquals(product1, Instancio.create(ProductPrice.class));
     }
 }

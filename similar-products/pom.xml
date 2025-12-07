@@ -93,12 +93,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>nl.jqno.equalsverifier</groupId>
-			<artifactId>equalsverifier</artifactId>
-			<version>${equalsverifier.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.instancio</groupId>
 			<artifactId>instancio-junit</artifactId>
 			<version>${instancio.version}</version>

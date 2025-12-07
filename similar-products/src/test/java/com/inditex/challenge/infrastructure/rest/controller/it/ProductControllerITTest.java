@@ -1,88 +1,199 @@
 package com.inditex.challenge.infrastructure.rest.controller.it;
 
-import com.inditex.challenge.application.workflow.SimilarProductsWorkFlow;
-import com.inditex.challenge.domain.exception.ProductNotFoundException;
-import com.inditex.challenge.domain.model.identity.ProductId;
-import com.inditex.challenge.domain.model.vo.SimilarProducts;
-import com.inditex.challenge.infrastructure.rest.api.model.ProductDetail;
-import com.inditex.challenge.infrastructure.rest.controller.ProductController;
-import com.inditex.challenge.infrastructure.rest.mapper.ProductDetailRequestMapper;
-import com.inditex.challenge.infrastructure.rest.mapper.ProductIdRequestMapper;
-import org.instancio.Instancio;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Set;
+import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@WebMvcTest(ProductController.class)
 @ActiveProfiles("test")
-class ProductControllerITTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class ProductControllerITTest {
 
+    private static final int NOT_FOUND_CODE = 404;
+    private static final int INTERNAL_SERVER_ERROR_CODE = 500;
+    private static final String CONTENT_TYPE = "application/json";
+    private static final String HEADERS = "Content-Type";
+    private static final String NOT_FOUND_DESC = "Not Found";
+    private static final String INTERNAL_SERVER_ERROR_DESC = "Internal Server Error";
+    @LocalServerPort
+    private int port;
     @Autowired
-    private MockMvc mockMvc;
-    @MockitoBean
-    private SimilarProductsWorkFlow similarProductsWorkFlow;
-    @MockitoBean
-    private ProductIdRequestMapper productIdRequestMapper;
-    @MockitoBean
-    private ProductDetailRequestMapper productDetailRequestMapper;
-    @Mock
-    private SimilarProducts similarProducts;
+    private WebTestClient webTestClient;
+    @Autowired
+    private MockWebServer mockWebServer;
 
     @Test
-    void givenExistingProductId_whenGetProductSimilar_thenReturnOkWithBody() throws Exception {
+    void givenProductId_whenGetProductSimilar_thenReturnSimilarProducts() {
         //given
-        final var productId = 1L;
-        final var domainId = new ProductId(productId);
-        final var detail1 = Instancio.create(ProductDetail.class);
-        final var detail2 = Instancio.create(ProductDetail.class);
+            //similar-products
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(similarProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
+            //first-product-detail
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(firstProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
+            //second-product-detail
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(secondProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
 
-        when(productIdRequestMapper.toProductId(String.valueOf(productId))).thenReturn(domainId);
-        when(similarProductsWorkFlow.executeWorkFlow(domainId)).thenReturn(similarProducts);
-        when(productDetailRequestMapper.toProductDetailSet(similarProducts))
-                .thenReturn(Set.of(detail1, detail2));
-
-        //when
-        mockMvc.perform(get("/product/{productId}/similar", productId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2));
-
-        //then
-        verify(productIdRequestMapper, times(1)).toProductId(String.valueOf(productId));
-        verify(similarProductsWorkFlow, times(1)).executeWorkFlow(domainId);
-        verify(productDetailRequestMapper, times(1)).toProductDetailSet(similarProducts);
+        //when /then
+        webTestClient.get().uri("/product/{productId}/similar", "2")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .json("""
+                        [
+                            {"id":"2","name":"Dress","price":19.99,"availability":true},
+                            {"id":"3","name":"Blazer","price":29.99,"availability":false}
+                        ]
+                        """);
     }
 
-    //@Test
-    void givenNonExistingProductId_whenGetProductSimilar_thenReturnNotFound() {
+    @Test
+    void givenProductId_whenGetProductSimilar_thenReturnProductDetailTimeOutException() {
         //given
-        final var productId = 999L;
-        ProductId domainId = new ProductId(productId);
+            //similar-products
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(similarProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
+            //first-product-detail
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(firstProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
 
-        when(productIdRequestMapper.toProductId(String.valueOf(productId))).thenReturn(domainId);
-        when(similarProductsWorkFlow.executeWorkFlow(domainId))
-                .thenThrow(new ProductNotFoundException());
+        //when /then
+        webTestClient.get().uri("/product/{productId}/similar", "2")
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
 
-        //when
-        assertThrows((ProductNotFoundException.class),
-                () -> mockMvc.perform(get("/product/{productId}/similar", productId))
-                .andExpect(status().isNotFound()));
+    @Test
+    void givenNotExistsProductId_whenGetProductSimilar_thenReturnSimilarProductsNotFoud() {
+        //given
+            //similar-products
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(NOT_FOUND_CODE)
+                        .setBody(NOT_FOUND_DESC));
 
-        //then
-        verify(productIdRequestMapper, times(1)).toProductId(String.valueOf(productId));
-        verify(similarProductsWorkFlow, times(1)).executeWorkFlow(domainId);
-        verifyNoInteractions(productDetailRequestMapper);
+        //when /then
+        webTestClient.get().uri("/product/{productId}/similar", "11")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void givenProductId_whenGetProductSimilar_thenReturnGenericException() {
+        //given
+            //similar-products
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(INTERNAL_SERVER_ERROR_CODE)
+                        .setBody(INTERNAL_SERVER_ERROR_DESC));
+
+        //when /then
+        webTestClient.get().uri("/product/{productId}/similar", "11")
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void givenProductId_whenGetProductSimilar_thenReturnProductDetailNotFound() {
+        //given
+            //similar-products
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(similarProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
+            //first-product-detail
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(firstProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
+            //second-product-detail
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(NOT_FOUND_CODE)
+                        .setBody(NOT_FOUND_DESC));
+
+        //when /then
+        webTestClient.get().uri("/product/{productId}/similar", "2")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void givenProductId_whenGetProductSimilar_thenReturnProductDetailGenericException() {
+        //given
+            //similar-products
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(similarProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
+            //first-product-detail
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody(firstProductProvider())
+                        .addHeader(HEADERS, CONTENT_TYPE));
+            //second-product-detail
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(INTERNAL_SERVER_ERROR_CODE)
+                        .setBody(INTERNAL_SERVER_ERROR_DESC));
+
+        //when /then
+        webTestClient.get().uri("/product/{productId}/similar", "2")
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    static String similarProductProvider() {
+        return "[2,3]";
+    }
+
+    static String firstProductProvider() {
+        return "{\"id\":\"2\",\"name\":\"Dress\",\"price\":19.99,\"availability\":true}";
+    }
+
+    static String secondProductProvider() {
+        return "{\"id\":\"3\",\"name\":\"Blazer\",\"price\":29.99,\"availability\":false}";
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean(destroyMethod = "shutdown")
+        @Primary
+        MockWebServer mockWebServer() throws IOException {
+            MockWebServer server = new MockWebServer();
+            server.start();
+            return server;
+        }
+
+        @Bean
+        @Primary
+        WebClient webClient(MockWebServer mockWebServer) {
+            return WebClient.builder()
+                    .baseUrl(mockWebServer.url("/").toString())
+                    .build();
+        }
     }
 }
